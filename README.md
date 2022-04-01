@@ -185,7 +185,7 @@ usage: semiautorecon [-t TARGET_FILE] [-p PORTS] [-m MAX_SCANS] [-mp MAX_PORT_SC
                  [--exclude-tags TAGS] [--port-scans PLUGINS] [--service-scans PLUGINS] [--reports PLUGINS] [--plugins-dir PLUGINS_DIR]
                  [--add-plugins-dir PLUGINS_DIR] [-l [TYPE]] [-o OUTPUT] [--single-target] [--only-scans-dir] [--no-port-dirs]
                  [--heartbeat HEARTBEAT] [--timeout TIMEOUT] [--target-timeout TARGET_TIMEOUT] [--nmap NMAP | --nmap-append NMAP_APPEND]
-                 [--proxychains] [--disable-sanity-checks] [--disable-keyboard-control] [--force-services SERVICE [SERVICE ...]] [--accessible]
+                 [--proxychains] [--disable-sanity-checks] [--force-services SERVICE [SERVICE ...]] [--accessible]
                  [-v] [--version] [--curl.path VALUE] [--dirbuster.tool {feroxbuster,gobuster,dirsearch,ffuf,dirb}]
                  [--dirbuster.wordlist VALUE [VALUE ...]] [--dirbuster.threads VALUE] [--dirbuster.ext VALUE]
                  [--onesixtyone.community-strings VALUE] [--global.username-wordlist VALUE] [--global.password-wordlist VALUE]
@@ -247,8 +247,6 @@ optional arguments:
   --proxychains         Use if you are running SemiAutoRecon via proxychains. Default: False
   --disable-sanity-checks
                         Disable sanity checks that would otherwise prevent the scans from running. Default: False
-  --disable-keyboard-control
-                        Disables keyboard control ([s]tatus, Up, Down) if you are in SSH or Docker.
   --force-services SERVICE [SERVICE ...]
                         A space separated list of services in the following style: tcp/80/http tcp/443/https/secure
   --accessible          Attempts to make SemiAutoRecon output more accessible to screenreaders. Default: False

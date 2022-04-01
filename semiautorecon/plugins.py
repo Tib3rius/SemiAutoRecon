@@ -364,7 +364,6 @@ class SemiAutoRecon(object):
 			elif confirm.strip() == 'SKIP':
 				process = await asyncio.create_subprocess_shell(
 					'return',
-					stdin=open('/dev/null'),
 					stdout=asyncio.subprocess.PIPE,
 					stderr=asyncio.subprocess.PIPE)
 
@@ -376,12 +375,8 @@ class SemiAutoRecon(object):
 
 				return process, cout, cerr
 
-				target.semiautorecon.errors = True
-				await asyncio.sleep(5)
-
 		process = await asyncio.create_subprocess_shell(
 			cmd,
-			stdin=open('/dev/null'),
 			stdout=asyncio.subprocess.PIPE,
 			stderr=asyncio.subprocess.PIPE)
 

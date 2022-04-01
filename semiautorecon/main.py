@@ -94,9 +94,7 @@ def cancel_all_tasks(signal, frame):
 				except ProcessLookupError: # Will get raised if the process finishes before we get to killing it.
 					pass
 
-	if not config['disable_keyboard_control']:
-		# Restore original terminal settings.
-		termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, config['terminal_settings'])
+	termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, config['terminal_settings'])
 
 async def start_heartbeat(target, period=60):
 	while True:
@@ -114,56 +112,6 @@ async def start_heartbeat(target, period=60):
 				info('{bgreen}' + current_time + '{rst} - There are {byellow}' + str(count) + '{rst} scans still running against {byellow}' + target.address + '{rst}' + tasks_list)
 			elif count == 1:
 				info('{bgreen}' + current_time + '{rst} - There is {byellow}1{rst} scan still running against {byellow}' + target.address + '{rst}' + tasks_list)
-
-async def keyboard():
-	input = ''
-	while True:
-		if select.select([sys.stdin],[],[],0.1)[0]:
-			input += sys.stdin.buffer.read1(-1).decode('utf8')
-			while input != '':
-				if len(input) >= 3:
-					if input[:3] == '\x1b[A':
-						input = ''
-						if config['verbose'] == 3:
-							info('Verbosity is already at the highest level.')
-						else:
-							config['verbose'] += 1
-							info('Verbosity increased to ' + str(config['verbose']))
-					elif input[:3] == '\x1b[B':
-						input = ''
-						if config['verbose'] == 0:
-							info('Verbosity is already at the lowest level.')
-						else:
-							config['verbose'] -= 1
-							info('Verbosity decreased to ' + str(config['verbose']))
-					else:
-						if input[0] != 's':
-							input = input[1:]
-
-				if len(input) > 0 and input[0] == 's':
-					input = input[1:]
-					for target in semiautorecon.scanning_targets:
-						count = len(target.running_tasks)
-
-						tasks_list = []
-						if config['verbose'] >= 1:
-							for key, value in target.running_tasks.items():
-								elapsed_time = calculate_elapsed_time(value['start'], short=True)
-								tasks_list.append('{bblue}' + key + '{rst}' + ' (elapsed: ' + elapsed_time + ')')
-
-							tasks_list = ':\n    ' + '\n    '.join(tasks_list)
-						else:
-							tasks_list = ''
-
-						current_time = datetime.now().strftime('%H:%M:%S')
-
-						if count > 1:
-							info('{bgreen}' + current_time + '{rst} - There are {byellow}' + str(count) + '{rst} scans still running against {byellow}' + target.address + '{rst}' + tasks_list)
-						elif count == 1:
-							info('{bgreen}' + current_time + '{rst} - There is {byellow}1{rst} scan still running against {byellow}' + target.address + '{rst}' + tasks_list)
-				else:
-					input = input[1:]
-		await asyncio.sleep(0.1)
 
 async def get_semaphore(semiautorecon):
 	semaphore = semiautorecon.service_scan_semaphore
@@ -837,7 +785,6 @@ async def run():
 	nmap_group.add_argument('--nmap-append', action='store', help='Append to the default {nmap_extra} variable in scans. Default: %(default)s')
 	parser.add_argument('--proxychains', action='store_true', help='Use if you are running SemiAutoRecon via proxychains. Default: %(default)s')
 	parser.add_argument('--disable-sanity-checks', action='store_true', help='Disable sanity checks that would otherwise prevent the scans from running. Default: %(default)s')
-	parser.add_argument('--disable-keyboard-control', action='store_true', help='Disables keyboard control ([s]tatus, Up, Down) if you are in SSH or Docker.')
 	parser.add_argument('--force-services', action='store', nargs='+', metavar='SERVICE', help='A space separated list of services in the following style: tcp/80/http tcp/443/https/secure')
 	parser.add_argument('-mpti', '--max-plugin-target-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of instances (per target) in the following style: nmap-http:2 dirbuster:1. Default: %(default)s')
 	parser.add_argument('-mpgi', '--max-plugin-global-instances', action='store', nargs='+', metavar='PLUGIN:NUMBER', help='A space separated list of plugin slugs with the max number of global instances in the following style: nmap-http:2 dirbuster:1. Default: %(default)s')
@@ -1441,10 +1388,6 @@ async def run():
 		if i >= num_initial_targets:
 			break
 
-	if not config['disable_keyboard_control']:
-		#tty.setcbreak(sys.stdin.fileno())
-		keyboard_monitor = asyncio.create_task(keyboard())
-
 	timed_out = False
 	while pending:
 		done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED, timeout=1)
@@ -1488,9 +1431,6 @@ async def run():
 				if i >= num_new_targets:
 					break
 
-	if not config['disable_keyboard_control']:
-		keyboard_monitor.cancel()
-
 	# If there's only one target we don't need a combined report
 	if len(semiautorecon.completed_targets) > 1:
 		for plugin in semiautorecon.plugin_types['report']:
@@ -1530,9 +1470,7 @@ async def run():
 	if semiautorecon.missing_services:
 		warn('{byellow}SemiAutoRecon identified the following services, but could not match them to any plugins based on the service name. Please report these to Tib3rius: ' + ', '.join(semiautorecon.missing_services) + '{rst}')
 
-	if not config['disable_keyboard_control']:
-		# Restore original terminal settings.
-		termios.tcsetattr(sys.stdin, termios.TCSADRAIN, config['terminal_settings'])
+	termios.tcsetattr(sys.stdin, termios.TCSADRAIN, config['terminal_settings'])
 
 def main():
 	# Capture Ctrl+C and cancel everything.
