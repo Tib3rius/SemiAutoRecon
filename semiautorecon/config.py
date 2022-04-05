@@ -41,7 +41,7 @@ configurable_boolean_keys = [
 ]
 
 config = {
-	'protected_classes': ['autorecon', 'target', 'service', 'commandstreamreader', 'plugin', 'portscan', 'servicescan', 'global', 'pattern'],
+	'protected_classes': ['semiautorecon', 'target', 'service', 'commandstreamreader', 'plugin', 'portscan', 'servicescan', 'global', 'pattern'],
 	'config_dir': config_dir,
 	'global_file': None,
 	'ports': None,
